@@ -3,6 +3,8 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Todo;
+use AppBundle\Form\TodoType;
+
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -36,50 +38,15 @@ class TodoController extends Controller
     {
         $todo = new Todo();
 
-        $form = $this->createFormBuilder($todo)
-            ->add('name', TextType::class, array(
-                'attr' => array(
-                    'class' => 'form-control',
-                    'style' => 'margin: 0 0 0 15px'
-                )
-            ))
-            ->add('category', TextType::class, array(
-                'attr' => array(
-                    'class' => 'form-control',
-                    'style' => 'margin: 0 0 0 15px'
-                )
-            ))
-            ->add('description', TextareaType::class, array(
-                'attr' => array(
-                    'class' => 'form-control',
-                    'style' => 'margin: 0 0 0 15px'
-                )
-            ))
-            ->add('priority', ChoiceType::class, array(
-                'choices' => array(
-                    'Low' => 'Low',
-                    'Normal' => 'Normal',
-                    'High' => 'High'
-                ),
-                'attr' => array(
-                    'class' => 'form-control',
-                    'style' => 'margin: 0 0 0 15px'
-                )
-            ))
-            ->add('due_date', DateTimeType::class, array(
-                'attr' => array(
-                    'class' => 'formcontrol',
-                    'style' => 'margin: 0 0 0 15px'
-                )
-            ))
-            ->add('Save', SubmitType::class, array(
+        $form = $this->createForm(TodoType::class, $todo);
+
+        $form->add('Save', SubmitType::class, array(
                 'label' => 'Create ToDo',
                 'attr' => array(
                     'class' => 'btn btn-primary',
                     'style' => 'margin: 0 0 0 15px'
                 )
-            ))
-            ->getForm();
+        ));
 
         $form->handleRequest($request);
 
@@ -119,51 +86,15 @@ class TodoController extends Controller
      */
     public function editAction(Todo $todo, Request $request)
     {
-        $form = $this->createFormBuilder($todo)
+        $form = $this->createForm(TodoType::class, $todo);
 
-        ->add('name', TextType::class, array(
-            'attr' => array(
-                'class' => 'form-control',
-                'style' => 'margin: 0 0 0 15px'
-            )
-        ))
-        ->add('category', TextType::class, array(
-            'attr' => array(
-                'class' => 'form-control',
-                'style' => 'margin: 0 0 0 15px'
-            )
-        ))
-        ->add('description', TextareaType::class, array(
-            'attr' => array(
-                'class' => 'form-control',
-                'style' => 'margin: 0 0 0 15px'
-            )
-        ))
-        ->add('priority', ChoiceType::class, array(
-            'choices' => array(
-                'Low' => 'Low',
-                'Normal' => 'Normal',
-                'High' => 'High'
-            ),
-            'attr' => array(
-                'class' => 'form-control',
-                'style' => 'margin: 0 0 0 15px'
-            )
-        ))
-        ->add('due_date', DateTimeType::class, array(
-            'attr' => array(
-                'class' => 'formcontrol',
-                'style' => 'margin: 0 0 0 15px'
-            )
-        ))
-        ->add('Save', SubmitType::class, array(
+        $form->add('Save', SubmitType::class, array(
             'label' => 'Update ToDo',
             'attr' => array(
                 'class' => 'btn btn-primary',
                 'style' => 'margin: 0 0 0 15px'
             )
-        ))
-        ->getForm();
+        ));
 
         $form->handleRequest($request);
 
@@ -175,8 +106,6 @@ class TodoController extends Controller
             $priority = $form['priority']->getData();
             $due_date = $form['due_date']->getData();
 
-            $now = new\DateTime('now');
-
             $em = $this->getDoctrine()->getManager();
 
             $todo->setName($name);
@@ -184,7 +113,6 @@ class TodoController extends Controller
             $todo->setDescription($description);
             $todo->setPriority($priority);
             $todo->setDueDate($due_date);
-            $todo->setCreateDate($now);
 
             $em->flush();
 
@@ -213,9 +141,9 @@ class TodoController extends Controller
      */
     public function deleteAction(Todo $todo)
     {
-//        $em = $this->getDoctrine()->getManager();
-//        $em->remove($todo);
-//        $em->flush();
+        $em = $this->getDoctrine()->getManager();
+        $em->remove($todo);
+        $em->flush();
 
         $this->addFlash('notice', 'ToDo Removed');
 
