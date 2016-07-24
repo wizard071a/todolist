@@ -117,16 +117,108 @@ class TodoController extends Controller
     /**
      * @Route("/todo/edit/{id}", name="todo_edit")
      */
-    public function editAction($id, Request $request)
+    public function editAction(Todo $todo, Request $request)
     {
-        return $this->render('todo/edit.html.twig');
+        $form = $this->createFormBuilder($todo)
+
+        ->add('name', TextType::class, array(
+            'attr' => array(
+                'class' => 'form-control',
+                'style' => 'margin: 0 0 0 15px'
+            )
+        ))
+        ->add('category', TextType::class, array(
+            'attr' => array(
+                'class' => 'form-control',
+                'style' => 'margin: 0 0 0 15px'
+            )
+        ))
+        ->add('description', TextareaType::class, array(
+            'attr' => array(
+                'class' => 'form-control',
+                'style' => 'margin: 0 0 0 15px'
+            )
+        ))
+        ->add('priority', ChoiceType::class, array(
+            'choices' => array(
+                'Low' => 'Low',
+                'Normal' => 'Normal',
+                'High' => 'High'
+            ),
+            'attr' => array(
+                'class' => 'form-control',
+                'style' => 'margin: 0 0 0 15px'
+            )
+        ))
+        ->add('due_date', DateTimeType::class, array(
+            'attr' => array(
+                'class' => 'formcontrol',
+                'style' => 'margin: 0 0 0 15px'
+            )
+        ))
+        ->add('Save', SubmitType::class, array(
+            'label' => 'Update ToDo',
+            'attr' => array(
+                'class' => 'btn btn-primary',
+                'style' => 'margin: 0 0 0 15px'
+            )
+        ))
+        ->getForm();
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $name = $form['name']->getData();
+            $category = $form['category']->getData();
+            $description = $form['description']->getData();
+            $priority = $form['priority']->getData();
+            $due_date = $form['due_date']->getData();
+
+            $now = new\DateTime('now');
+
+            $em = $this->getDoctrine()->getManager();
+
+            $todo->setName($name);
+            $todo->setCategory($category);
+            $todo->setDescription($description);
+            $todo->setPriority($priority);
+            $todo->setDueDate($due_date);
+            $todo->setCreateDate($now);
+
+            $em->flush();
+
+            $this->addFlash('notice', 'ToDo Updated');
+
+            return $this->redirectToRoute('todo_list');
+        }
+
+        return $this->render('todo/edit.html.twig', array(
+            'form' => $form->createView()
+        ));
     }
 
     /**
      * @Route("/todo/details/{id}", name="todo_details")
      */
-    public function detailsAction($id)
+    public function detailsAction(Todo $todo)
     {
-        return $this->render('todo/details.html.twig');
+        return $this->render('todo/details.html.twig', array(
+            'todo' => $todo
+        ));
+    }
+
+    /**
+     * @Route("/todo/delete/{id}", name="todo_delete")
+     */
+    public function deleteAction(Todo $todo)
+    {
+//        $em = $this->getDoctrine()->getManager();
+//        $em->remove($todo);
+//        $em->flush();
+
+        $this->addFlash('notice', 'ToDo Removed');
+
+        return $this->redirectToRoute('todo_list');
     }
 }
