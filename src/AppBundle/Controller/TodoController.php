@@ -40,14 +40,6 @@ class TodoController extends Controller
 
         $form = $this->createForm(TodoType::class, $todo);
 
-        $form->add('Save', SubmitType::class, array(
-                'label' => 'Create ToDo',
-                'attr' => array(
-                    'class' => 'btn btn-primary',
-                    'style' => 'margin: 0 0 0 15px'
-                )
-        ));
-
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -56,7 +48,7 @@ class TodoController extends Controller
             $category = $form['category']->getData();
             $description = $form['description']->getData();
             $priority = $form['priority']->getData();
-            $due_date = $form['due_date']->getData();
+            $due_date = $form['dueDate']->getData();
 
             $now = new\DateTime('now');
 
@@ -88,14 +80,6 @@ class TodoController extends Controller
     {
         $form = $this->createForm(TodoType::class, $todo);
 
-        $form->add('Save', SubmitType::class, array(
-            'label' => 'Update ToDo',
-            'attr' => array(
-                'class' => 'btn btn-primary',
-                'style' => 'margin: 0 0 0 15px'
-            )
-        ));
-
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -104,7 +88,7 @@ class TodoController extends Controller
             $category = $form['category']->getData();
             $description = $form['description']->getData();
             $priority = $form['priority']->getData();
-            $due_date = $form['due_date']->getData();
+            $due_date = $form['dueDate']->getData();
 
             $em = $this->getDoctrine()->getManager();
 
